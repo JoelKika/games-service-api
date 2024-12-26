@@ -10,22 +10,40 @@ import java.util.Optional;
 @Service
 public class GameServiceImpl implements GameService {
     private final GameRepository gameRepository;
-
     public GameServiceImpl(GameRepository gameRepository) {
         this.gameRepository = gameRepository;
     }
-
     @Override
     public GameModel createGame(GameModel gameRequest) {
         return Optional.of(gameRequest)
                 .map(this::mapToEntity)
                 .map(gameRepository::save)
-                .orElseThrow(()-> new RuntimeException("Error creating game"))
-                ;
-
-
+                .orElseThrow(()-> new RuntimeException("Error creating game"));
     }
-
+    @Override
+    public GameModel getGame(long gameId) {
+        return Optional.of(gameId)
+                .flatMap(gameRepository::findById)
+                .orElseThrow(()->new RuntimeException("Error couldn't find game by id"));
+    }
+    @Override
+    public GameModel putGame(long gameId, String newName) {
+        return gameRepository.findById(gameId)
+                .map(game -> {
+                    game.setName(newName);
+                    return gameRepository.save(game);
+                })
+                .orElseThrow(() -> new RuntimeException("Error updating game"));
+    }
+    @Override
+    public GameModel deleteGame(long gameId) {
+        return gameRepository.findById(gameId)
+                .map(game -> {
+                    gameRepository.delete(game);
+                    return game;
+                })
+                .orElseThrow(()->new RuntimeException("Error delete game"));
+    }
     private GameModel mapToEntity(GameModel gameRequest) {
         return GameModel.builder()
                 .name(gameRequest.getName())
