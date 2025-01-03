@@ -1,6 +1,6 @@
-package com.example.games_service_api.commons.controller.impl;
+package com.example.games_service_api.controller.impl;
 
-import com.example.games_service_api.commons.controller.GameApi;
+import com.example.games_service_api.controller.GameApi;
 import com.example.games_service_api.commons.entities.GameModel;
 import com.example.games_service_api.service.GameService;
 import org.springframework.http.ResponseEntity;
@@ -25,19 +25,14 @@ public class GameController implements GameApi {
     }
 
     @Override
-    public ResponseEntity<GameModel> putGame(Long gameId) {
-        return null;
+    public ResponseEntity<GameModel> putGame(GameModel gameRequest) {
+        return ResponseEntity.ok(gameService.putGame(gameRequest));
     }
 
     @Override
-    public ResponseEntity<GameModel> putGame(Long gameId, String newName) {
-        return ResponseEntity.ok(gameService.putGame(gameId, newName));
+    public ResponseEntity<GameModel> deleteGame(GameModel gameRequest) {
+        return ResponseEntity.ok(gameService.deleteGame(gameRequest));
     }
 
-
-    @Override
-    public ResponseEntity<GameModel> deleteGame(Long gameId) {
-        return ResponseEntity.ok(gameService.deleteGame(gameId));
-    }
 
 }

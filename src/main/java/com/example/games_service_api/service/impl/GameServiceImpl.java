@@ -11,6 +11,7 @@ import java.util.Optional;
 public class GameServiceImpl implements GameService {
     private final GameRepository gameRepository;
     public GameServiceImpl(GameRepository gameRepository) {
+
         this.gameRepository = gameRepository;
     }
     @Override
@@ -26,23 +27,22 @@ public class GameServiceImpl implements GameService {
                 .flatMap(gameRepository::findById)
                 .orElseThrow(()->new RuntimeException("Error couldn't find game by id"));
     }
+
     @Override
-    public GameModel putGame(long gameId, String newName) {
-        return gameRepository.findById(gameId)
-                .map(game -> {
-                    game.setName(newName);
-                    return gameRepository.save(game);
-                })
-                .orElseThrow(() -> new RuntimeException("Error updating game"));
+    public GameModel putGame(GameModel gameRequest) {
+        GameModel existingGame = gameRepository.findById(gameRequest.getGameId())
+                .orElseThrow(() -> new RuntimeException("Game not found"));
+        existingGame.setName(gameRequest.getName());
+        gameRepository.save(existingGame);
+        return null;
     }
+
     @Override
-    public GameModel deleteGame(long gameId) {
-        return gameRepository.findById(gameId)
-                .map(game -> {
-                    gameRepository.delete(game);
-                    return game;
-                })
-                .orElseThrow(()->new RuntimeException("Error delete game"));
+    public GameModel deleteGame(GameModel gameRequest) {
+        GameModel existingGame = gameRepository.findById(gameRequest.getGameId())
+                .orElseThrow(() -> new RuntimeException("Game not found"));
+        gameRepository.delete(existingGame);
+        return null;
     }
     private GameModel mapToEntity(GameModel gameRequest) {
         return GameModel.builder()
