@@ -29,20 +29,22 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public GameModel putGame(GameModel gameRequest) {
-        GameModel existingGame = gameRepository.findById(gameRequest.getGameId())
-                .orElseThrow(() -> new RuntimeException("Game not found"));
-        existingGame.setName(gameRequest.getName());
-        gameRepository.save(existingGame);
-        return null;
+    public void putGame(Long gameId, GameModel gameRequest) {
+        Optional.of(gameId)
+                .flatMap(gameRepository::findById)
+                .map(existingGame -> updateGameFields(existingGame, gameRequest))
+                .map(gameRepository::save)
+                .orElseThrow(()->new RuntimeException("Error updating game"));
     }
-
+    private GameModel updateGameFields(GameModel existingGame, GameModel gameRequest) {
+        existingGame.setName(gameRequest.getName());
+        return existingGame;
+    }
     @Override
-    public GameModel deleteGame(GameModel gameRequest) {
-        GameModel existingGame = gameRepository.findById(gameRequest.getGameId())
-                .orElseThrow(() -> new RuntimeException("Game not found"));
-        gameRepository.delete(existingGame);
-        return null;
+    public void deleteGame(Long gameId) {
+        Optional.of(gameId)
+                .flatMap(gameRepository::findById)
+                .ifPresent(gameRepository::delete);
     }
     private GameModel mapToEntity(GameModel gameRequest) {
         return GameModel.builder()
